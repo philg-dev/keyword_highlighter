@@ -1,0 +1,39 @@
+{
+
+    "manifest_version": 3,
+    "name": "Skim Reader",
+    "version": "0.1",
+  
+    "description": "Highlight multiple keywords of your choice on every website with a single click!",
+    "icons": {
+      "48": "./icons/icon-48.png",
+      "96": "./icons/icon-96.png"
+    },
+  
+    "permissions": [
+      "storage",
+      "scripting",
+      "activeTab"
+    ],
+  
+    "action": {
+      "default_icon": {
+        "48": "./icons/icon-48.png",
+        "96": "./icons/icon-96.png"
+      },
+      "default_title": "Keyword Highlighter",
+      "default_popup": "./html/settings.html"
+    },
+
+    "background": {
+      "page": "./html/background.html"
+    },
+  
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "keyword-highlighter@philg.dev"
+      }
+    }
+  
+  }
+  
