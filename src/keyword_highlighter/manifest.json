@@ -24,10 +24,6 @@
       "default_title": "Keyword Highlighter",
       "default_popup": "./html/settings.html"
     },
-
-    "background": {
-      "page": "./html/background.html"
-    },
   
     "browser_specific_settings": {
       "gecko": {
