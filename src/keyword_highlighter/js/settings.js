@@ -3,6 +3,17 @@ import {
     saveSettingsToStorage,
 } from "./storage_service.js";
 
+/* Browser Compatibility Bullshit */
+const filePaths = {
+    // relative paths to script location
+    firefox: ["../js/keyword_highlighter_content.js"],
+    // relative paths to webextension root
+    chrome: [
+        "./lib/browser-polyfill.min.js",
+        "./js/keyword_highlighter_content.js",
+    ],
+};
+
 /* BEGIN Settings Panel*/
 const textareaMaxLength = 8192;
 
@@ -40,7 +51,7 @@ settings[var_negativeTerms] = [];
  *  - textarea
  */
 const loadSettingsIntoDOM = function (_settings) {
-    for (var key of Object.keys(_settings)) {
+    for (var key of isStringArray) {
         var domElem = document.getElementById(key);
         if (!domElem || domElem === new Object()) {
             console.warn(
@@ -84,7 +95,7 @@ const applySettings = async () => {
         console.debug("applySettings - settings doesn't exist!");
         return;
     }
-    for (var key of Object.keys(settings)) {
+    for (var key of isStringArray) {
         var domElem = document.querySelector(`#${key}`);
         if (!domElem || domElem === new Object()) {
             console.warn(
@@ -110,10 +121,6 @@ const applySettings = async () => {
             console.debug(e);
         }
     }
-    await browser.storage.local.set(settings).then(
-        () => console.log("Settings saved!"),
-        (e) => console.error(e)
-    );
 };
 
 /**
@@ -142,12 +149,24 @@ const executeScript = async function () {
             return;
         }
 
+        // default: use files for firefox
+        var filesToLoad = filePaths.firefox;
+
+        try {
+            // getBrowserInfo() only exists in Firefox
+            // TODO: replace with a better way to check which browser
+            browser.runtime.getBrowserInfo();
+        } catch (err) {
+            // when not firefox, switch to chrome paths, including browser polyfill
+            filesToLoad = filePaths.chrome;
+        }
+
         browser.scripting.executeScript({
             target: {
                 tabId: activeTabs[0].id,
                 allFrames: false,
             },
-            files: ["../js/keyword_highlighter_content.js"],
+            files: filesToLoad,
         });
     } catch (err) {
         console.error(`failed to execute script: ${err}`);
@@ -175,10 +194,8 @@ document
     .getElementById(id_executeButton)
     .addEventListener("click", executeScript);
 
-
-loadButtonHandler()   
+loadButtonHandler();
 console.debug("settings.js has been executed");
-
 
 const contentScriptMessageHandler = async function (data) {
     settings = await loadSettingsFromStorage();
