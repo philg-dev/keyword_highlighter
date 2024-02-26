@@ -1,10 +1,12 @@
+import { conditionalDebugLog } from "./utils.js";
+
 /**
  * @returns the settings stored in browser's storage.local
  */
 const loadSettingsFromStorage = async () => {
     return browser.storage.local.get().then(
         (val) => {
-            console.log(
+            conditionalDebugLog(
                 "loadSettingsFromStorage - Settings Loaded:" +
                     JSON.stringify(val)
             );
@@ -20,10 +22,12 @@ const loadSettingsFromStorage = async () => {
  */
 const saveSettingsToStorage = async (settings) => {
     await browser.storage.local.set(settings).then(
-        () =>
-            console.log(
-                "saveSettingsToStorage - Settings saved to storage.local!"
-            ),
+        () => {
+            conditionalDebugLog(
+                "saveSettingsToStorage - Settings saved to storage.local!" +
+                    JSON.stringify(settings)
+            );
+        },
         (e) => console.error(e)
     );
 };

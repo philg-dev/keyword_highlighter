@@ -3,9 +3,11 @@ import {
     saveSettingsToStorage,
 } from "./storage_service.js";
 
+import { conditionalDebugLog } from "./utils.js";
+
 /* Browser Compatibility Bullshit */
 const filePaths = {
-    // relative paths to script location
+    // relative paths to HTML location where this script is run from (wtf...)
     firefox: ["../js/keyword_highlighter_content.js"],
     // relative paths to webextension root
     chrome: [
@@ -66,17 +68,18 @@ const loadSettingsIntoDOM = function (_settings) {
                 continue;
             }
             // for text input, selects and textareas the value attribute works just fine
-            domElem.value = _settings[key];
+            // join arrays with an additional space after comma for better looks
+            domElem.value = Array.isArray(_settings[key]) ? _settings[key].join(", ") : _settings[key];
         } catch (e) {
             // in case of unsupported DOM element types and other unspecified errors
-            console.debug(
+            conditionalDebugLog(
                 `loadSettingsIntoDOM - trying to get DOM element corresponding to key: ${key} and got DOM element: ${JSON.stringify(
                     domElem
                 )}`
             );
         }
     }
-    console.debug(
+    conditionalDebugLog(
         "loadSettingsIntoDOM - Filled settings into DOM: " +
             JSON.stringify(_settings)
     );
@@ -92,9 +95,12 @@ const loadSettingsIntoDOM = function (_settings) {
  */
 const applySettings = async () => {
     if (!settings) {
-        console.debug("applySettings - settings doesn't exist!");
+        conditionalDebugLog("applySettings - settings doesn't exist!");
         return;
     }
+    conditionalDebugLog(
+        "applySettings - settings before applying: " + JSON.stringify(settings)
+    );
     for (var key of isStringArray) {
         var domElem = document.querySelector(`#${key}`);
         if (!domElem || domElem === new Object()) {
@@ -118,7 +124,7 @@ const applySettings = async () => {
             settings[key] = domElem.value;
         } catch (e) {
             // in case of unsupported DOM element types and other unspecified errors
-            console.debug(e);
+            conditionalDebugLog(e);
         }
     }
 };
@@ -127,22 +133,15 @@ const applySettings = async () => {
  * Executes the content script to highlight keywords on demand.
  */
 const executeScript = async function () {
-    console.debug("executeScript - test");
     try {
-        console.debug("executeScript - test 2");
         var activeTabs = await browser.tabs.query({
             active: true,
             currentWindow: true,
         });
-        console.debug("active tabs: " + activeTabs.length);
-        if (activeTabs.length > 1) {
-            for (var theTab of activeTabs) {
-                console.debug(JSON.stringify(theTab));
-            }
-        }
+        conditionalDebugLog("active tabs: " + activeTabs.length);
 
         if (activeTabs.length !== 1) {
-            console.debug(
+            conditionalDebugLog(
                 "Not exactly one active tab found! Number of active tabs: " +
                     activeTabs.length
             );
@@ -161,17 +160,17 @@ const executeScript = async function () {
             filesToLoad = filePaths.chrome;
         }
 
-        browser.scripting.executeScript({
+        await browser.scripting.executeScript({
             target: {
                 tabId: activeTabs[0].id,
                 allFrames: false,
             },
             files: filesToLoad,
         });
+        conditionalDebugLog("added content script to page");
     } catch (err) {
         console.error(`failed to execute script: ${err}`);
     }
-    console.debug("added content script to page");
 };
 
 const loadButtonHandler = async function () {
@@ -195,11 +194,10 @@ document
     .addEventListener("click", executeScript);
 
 loadButtonHandler();
-console.debug("settings.js has been executed");
 
 const contentScriptMessageHandler = async function (data) {
     settings = await loadSettingsFromStorage();
-    console.debug(
+    conditionalDebugLog(
         "contentScriptMessageHandler - data: " + JSON.stringify(data)
     );
     if (data.message === "getSettings") return Promise.resolve(settings);
@@ -209,3 +207,5 @@ const contentScriptMessageHandler = async function (data) {
 // TODO: implement onChange listener for local storage values and only reload settings on demand
 
 browser.runtime.onMessage.addListener(contentScriptMessageHandler);
+
+conditionalDebugLog("settings.js has been executed");
