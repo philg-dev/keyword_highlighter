@@ -26,6 +26,7 @@
 - jump / cycle through highlights like browser search
   - use methods `element.checkVisibility()` and `element.scrollIntoView()`
 - implement "match whole word" mechanics alongside current behavior (only match words that are exactly the search term)
+  - useful especially for acronyms which often are randomly part of longer words otherwise
 - implement "highlight whole word" (when sub-term matches, highlight entire word for better legibility)
 - color picker for custom styles
   - Style css class prefix/postfix use color value
