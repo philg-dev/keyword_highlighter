@@ -85,3 +85,7 @@ One list of terms contains a long word e.g. `longSearchTerm` and another list co
 If a website uses an iFrame the search terms in that iFrame are currently not highlighted by the script.
 This could probably be fixed by using `allFrames: true` as a parameter for `browser.scripting.executeScript()`.
 Think about consequences and find example page.
+
+## Case: using Dark Reader to enable dark mode on a website
+
+When using the "Dark Reader" add-on / webextension the highlights added by this extension might not work in certain configurations. This is especially the case when using "Static" theme generation mode. Some testing with Dark Reader's "Dynamic" theme generation mode showed promising results, but I've had massive performance issues with Dark Reader on non-static theme generation modes in the past.
