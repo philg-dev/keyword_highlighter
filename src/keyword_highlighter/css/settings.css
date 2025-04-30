@@ -13,17 +13,27 @@ html {
 }
 
 body {
-    width: 600px;
+    /* max dimensions for browser extensions popups is 800 x 600 px in Firefox
+     * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/user_interface/Popups#popup_resizing
+     */
+    width: 800px;
+    height: 600px;
     background: rgb(240, 240, 240);
     margin: 0 auto;
     padding: 2px;
     height: inherit;
 }
 
+textarea {
+    width: 90%;
+    min-width: 600px;
+    min-height: 120px;
+}
+
 .outer-wrapper {
     overflow: auto;
     width: 100%;
-    height: 290px;
+    height: 100%;
     background: rgb(240, 240, 240);
 }
 
